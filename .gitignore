@@ -1,6 +1,7 @@
 # Veri dosyaları (1.6GB CSV ve parquet'ler repoya girmez)
 data/
 models/
+*.png
 
 # Python
 __pycache__/
