@@ -39,3 +39,53 @@ Porto Metro hava kompresörü sensör verisi kullanılarak anomali tespiti yapan
 ## Veri Seti
 
 [MetroPT-3 Dataset — Kaggle](https://www.kaggle.com/datasets/anshtanwar/metro-train-dataset)
+
+# 🏭 Endüstriyel Kompresörlerde Kestirimci Bakım: Erken Uyarı ve Kök Neden Analizi
+
+Bu proje, sensör verileriyle izlenen endüstriyel bir hava kompresöründe meydana gelen mekanik arızaları **yaşanmadan önce tahmin etmeyi** (Predictive Maintenance) ve bu arızaların **kök nedenlerini (SHAP)** tespit etmeyi amaçlayan kapsamlı bir Derin Öğrenme (Deep Learning) çalışmasıdır.
+
+## 🚀 Proje Vizyonu ve Dönüşümü
+
+Proje başlangıçta gözetimsiz (unsupervised) bir Anomali Tespiti projesi olarak başlamış, ancak Keşifçi Veri Analizi (EDA) ve özel filtreleme teknikleri sayesinde **Gözetimli bir Erken Uyarı Sistemine (Supervised Early Warning System)** evrilmiştir.
+
+### 🔍 Faz 1: Anomali Tespiti ve Gürültü Filtreleme (Tamamlandı)
+
+Makinenin 1.5 milyon satırlık geçmiş sensör verisi üzerinde "Autoencoder" mimarisi kullanılarak bir yeniden yapılandırma (reconstruction) hatası (MSE) hesaplandı.
+
+* **Sorun:** Model, kompresörün normal ritmik dalgalanmalarını (yalancı alarmları) arıza sanarak "False Positive" çöplüğü yarattı.
+* **Mühendislik Çözümü (MAD Filtresi):** Yalancı alarmları ezmek ve sadece fiziksel krizleri izole etmek için Medyan Mutlak Sapma (MAD - Median Absolute Deviation) tabanlı 5x çarpanlı dinamik bir eşik (Threshold) filtresi geliştirildi.
+* **Sonuç:** 1.5 milyon satırlık veriden, makinenin gerçekten fiziksel olarak teklediği **167 Kesin Arıza Olayı (Kriz Anı)** %100 doğrulukla izole edildi.
+
+### 🕵️‍♂️ Kök Neden Analizi: TP2 Ritim Bozukluğu
+
+İzole edilen bu 167 kriz anına **SHAP (SHapley Additive exPlanations)** sarmalayıcısı uygulandı.
+
+* Sensörlerin çıplak gözle yapılan "Geniş Açı" (10.000 adımlık) analizinde, **TP2 sensörünün** kompresörün nefes alışverişini (basınç döngüsünü) temsil ettiği keşfedildi.
+* 167 arızanın tamamının, makinenin 1.0 basınç seviyesine ulaşamayıp 0.5 seviyelerinde "boğulması" ve ritminin kırılması sonucu yaşandığı matematiksel ve fiziksel olarak kanıtlandı.
+
+### 🔮 Faz 2: LSTM ile Erken Uyarı Sistemi (Aktif Geliştirme)
+
+Artık arızaların ne zaman ve nasıl yaşandığını bildiğimiz için (Y Etiketleri), hedefimiz makineyi arıza anında değil, **arıza yaşanmadan 5 dakika (300 adım) önce** uyaracak bir kahin model kurmaktır.
+
+* **Hedef:** Krizden önceki 300 adımı "Tehlike Bölgesi (1)" olarak etiketleyerek Sınıflandırma (Binary Classification) yapmak.
+* **Mimari:** Zaman serilerindeki hafıza yeteneğinden dolayı Gözetimli **LSTM (Long Short-Term Memory)** ağı kullanılmaktadır.
+* **Odak:** Klasik doğruluk (Accuracy) yerine, "Gerçekleşecek arızaların kaçını önceden bilebildik?" sorusuna yanıt veren **Recall (Duyarlılık)** metriği maksimize edilecektir.
+
+## 🛠️ Kullanılan Teknolojiler
+
+* **Veri İşleme:** Pandas, Numpy, Polars (Büyük veri optimizasyonu)
+* **Makine Öğrenmesi & Derin Öğrenme:** TensorFlow, Keras (Autoencoder & LSTM)
+* **Açıklanabilir Yapay Zeka (XAI):** SHAP (GradientExplainer)
+* **Görselleştirme:** Matplotlib (Fiziksel sensör ritim grafikleri)
+
+## 📂 Proje Adımları
+
+- [X] Veri Temizleme ve Ölçeklendirme (MinMaxScaler)
+- [X] Autoencoder ile Gözetimsiz Anomali Skoru (MSE) Üretimi
+- [X] MAD İstatistiksel Filtresi ile Yalancı Alarmların (False Positives) Temizlenmesi
+- [X] SHAP ile Kök Neden (Root Cause) Analizi
+- [X] Fiziksel Sensör Doğrulaması (TP2 Ritim Bozukluğu Tespiti)
+- [X] Pre-Anomaly (Erken Uyarı) Y Etiketlerinin Oluşturulması ve Veri Paketi İhracı
+- [ ] *[Yeni Notebook]* Zaman Serisi Train/Test Bölünmesi (Chronological Split)
+- [ ] *[Yeni Notebook]* Predictive LSTM Modelinin İnşası ve Eğitimi
+- [ ] *[Yeni Notebook]* Recall Odaklı Eşik Optimizasyonu ve Test
